@@ -3,6 +3,7 @@ theme: readthedocs
 nav:
   - Home: index.md
   - API Reference:
-    - API Overview: api/index.md
+    -API:
+      - PLOTTING: api/plotting.md
 plugins:
   # - mkdocstrings
