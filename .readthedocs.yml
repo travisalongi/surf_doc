@@ -8,5 +8,8 @@ build:
     install:
       - requirements: docs/requirements.txt
 
-# sphinx:
-#   configuration: docs/conf.py
+      version: 2
+
+mkdocs:
+  configuration: mkdocs.yml
+
