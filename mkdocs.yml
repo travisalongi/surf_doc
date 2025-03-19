@@ -1,5 +1,7 @@
 site_name: SURF Documentation
-theme: readthedocs
+theme: 
+  name: readthedocs
+  color_mode: auto
 nav:
   - Home: index.md
   - Installation: installation.md
