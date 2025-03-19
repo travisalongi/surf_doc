@@ -4,14 +4,9 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
-    pip:
-      packages:
-        - mkdocs
-        - mkdocstrings
+  python:
+    install:
+      - requirements: docs/requirements.txt
 
-python:
-  install:
-    - requirements: docs/requirements.txt
-
-sphinx:
-  configuration: docs/conf.py
+# sphinx:
+#   configuration: docs/conf.py
