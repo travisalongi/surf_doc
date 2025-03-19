@@ -26,6 +26,16 @@ def plane_fit(pts, thresh=100, maxIteration=1000):
 
     Note:
         ** Modified from https://github.com/leomariga/pyRANSAC-3D/ **
+
+    Example:
+        ```python
+        cluster_coords = data[["x", "y", "depth_m"]].values
+        plane_params, inliers = plane_fit(
+            cluster_coords,
+            thresh=250,
+            maxIteration=1000,
+        )
+        ```
     """
     n_points = pts.shape[0]
     best_eq = []

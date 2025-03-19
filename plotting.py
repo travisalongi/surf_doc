@@ -69,6 +69,13 @@ def plot_base_map(plotter, base_map_file):
     Args:
         plotter (pv.Plotter): PyVista plotter instance.
         base_map_file (str): Path to the base map GeoTIFF file.
+
+    Example:
+        ```python
+        import pyvista as pv
+        plotter=pv.Plotter()
+        plot_base_map(plotter, 'base_map.tiff')
+        ```
     """
     gtiff = pv.read(base_map_file)
     x, y = get_xy_coords_raster(base_map_file)
@@ -140,6 +147,15 @@ def plot_earthquakes(plotter, eq_catalog, point_size=3, min_depth=-15000, color=
         point_size (int, optional): Size of plotted earthquake points. Default is 3.
         min_depth (float, optional): Minimum depth filter (meters). Default is -15000.
         color (str, optional): Color of plotted earthquakes. Default is "pink".
+
+    Example:
+        ```
+        import pandas as pd
+        import numpy as np
+        catalog = pd.read_csv('catalog.csv')
+        data = np.array([catalog.x, catalog.y, catalog.depth_m]).T
+        plot_earthquakes(plotter, data, point_size=5, min_depth=-25000)
+        ```
     """
     eq_df = pd.read_csv(eq_catalog)
     eq_df = eq_df[eq_df.depth_m > min_depth]
@@ -277,6 +293,14 @@ def plot_topo_with_texture(
     Returns:
         pv.Texture:
             -PyVista texture object.
+
+    Example:
+        ```python
+        plotter = pv.Plotter()
+        dem_files = ['dem_tile1.tif', 'dem_tile2.tif']
+        texture_file = 'texture.tif'
+        plot_topo_with_texture(plotter, dem_files, texture_file)
+        ```
     """
     # Merge DEM tiles
     dem_datasets = [rasterio.open(f) for f in dem_files]
