@@ -1,0 +1,6 @@
+site_name: SURF Documentation
+theme: readthedocs
+nav:
+  - Home: index.md
+plugins:
+  - mkdocstrings
