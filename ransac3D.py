@@ -29,6 +29,9 @@ def plane_fit(pts, thresh=100, maxIteration=1000):
 
     Example:
         ```python
+        import pandas as pd
+        file = 'catalog.csv' # some rows x,y,depth_m all in meters
+        data = pd.read_csv(file)
         cluster_coords = data[["x", "y", "depth_m"]].values
         plane_params, inliers = plane_fit(
             cluster_coords,
