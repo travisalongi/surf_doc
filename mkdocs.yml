@@ -4,8 +4,16 @@ theme:
   color_mode: auto
 nav:
   - Home: index.md
-  - Installation: installation.md
-  - Usage: usage.md
-  - PLOTTING-API: api/plotting.md
+  - Getting Started:
+    - Installation: installation.md
+    - Usage: usage.md
+  - API Reference:
+    - Overview: api/overview.md
+    - UTILS: api/utils.md
+    - POWER LAW TOOLS: api/power_law_tools.md
+    - PLOTTING: api/plotting.md
+    - PLANE FITTING: api/ransac3d.md
 plugins:
   - mkdocstrings
+
+
