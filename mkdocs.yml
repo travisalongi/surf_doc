@@ -2,8 +2,6 @@ site_name: SURF Documentation
 theme: readthedocs
 nav:
   - Home: index.md
-  - API Reference:
-    -API:
-      - PLOTTING: api/plotting.md
-plugins:
+  - PLOTTING: api/plotting.md
+# plugins:
   # - mkdocstrings
