@@ -7,5 +7,5 @@ nav:
   - Installation: installation.md
   - Usage: usage.md
   - PLOTTING-API: api/plotting.md
-# plugins:
-  # - mkdocstrings
+plugins:
+  - mkdocstrings

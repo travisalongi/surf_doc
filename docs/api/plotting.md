@@ -1,6 +1,6 @@
 # Plotting API Documentation
 
-::: ./plotting
+::: plotting
     handler: python
     :members:
 
