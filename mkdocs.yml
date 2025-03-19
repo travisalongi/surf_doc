@@ -3,19 +3,18 @@ site_name: SURF Documentation
 theme: readthedocs
 
 plugins:
-  mkdocs-get-deps:
-  mkdocs:
-  mkdocs-auorefs:
   mkdocstrings:
+    # handlers:
+    #   python:
 
 nav:
   - Home: index.md
   - Getting Started:
     - Installation: installation.md
     - Usage (examples): usage.md
-  - API Reference:
-    - UTILS: api/utils.md
-    - POWER LAW TOOLS: api/power_law_tools.md
-    - PLOTTING: api/plotting.md
-    - PLANE FITTING: api/ransac3d.md
+  # - API Reference:
+  #   - UTILS: api/utils.md
+  #   - POWER LAW TOOLS: api/power_law_tools.md
+  #   - PLOTTING: api/plotting.md
+  #   - PLANE FITTING: api/ransac3d.md
 
