@@ -6,5 +6,5 @@ This is the documentation and API for the project. Below are the available secti
 
 - [Installation](installation.md)
 - [Usage](usage.md)
-- [API Reference](api/api_index.md)
+- API Reference
 
