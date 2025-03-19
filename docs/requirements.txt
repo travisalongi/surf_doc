@@ -1,3 +1,4 @@
 mkdocs
-mkdocstrings[python]
+mkdocs-get-deps
+mkdocs-autorefs
 mkdocstrings-python

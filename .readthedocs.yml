@@ -1,4 +1,3 @@
-version: 2
 
 build:
   os: ubuntu-22.04
@@ -6,8 +5,10 @@ build:
     python: "3.11"
 
 
+version: 2
 mkdocs:
   configuration: mkdocs.yml
+
 
 python:
   install:

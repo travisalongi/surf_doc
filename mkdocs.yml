@@ -3,9 +3,10 @@ site_name: SURF Documentation
 theme: readthedocs
 
 plugins:
+  mkdocs-get-deps:
+  mkdocs:
+  mkdocs-auorefs:
   mkdocstrings:
-    # handlers:
-    #   python:
 
 nav:
   - Home: index.md
