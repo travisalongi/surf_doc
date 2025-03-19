@@ -1,6 +1,8 @@
-# Welcome to My Project
+# Welcome to SURF documentation
 
-This is the documentation for my project. Below are the available sections:
+**Seismicity Utilized for Reconstructing Faults**
+
+This is the documentation and API for the project. Below are the available sections:
 
 - [Installation](installation.md)
 - [Usage](usage.md)
