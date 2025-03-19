@@ -2,10 +2,6 @@ site_name: SURF Documentation
 
 theme: readthedocs
 
-plugins:
-  mkdocstrings:
-    # handlers:
-    #   python:
 
 nav:
   - Home: index.md
@@ -18,3 +14,9 @@ nav:
   #   - PLOTTING: api/plotting.md
   #   - PLANE FITTING: api/ransac3d.md
 
+
+
+plugins:
+  mkdocstrings:
+    # handlers:
+    #   python:
