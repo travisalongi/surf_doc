@@ -15,6 +15,6 @@ nav:
   #   - PLANE FITTING: api/ransac3d.md
 
 plugins:
-  mkdocstrings
+  - mkdocstrings
 
 
