@@ -1,4 +1,7 @@
 site_name: SURF Documentation
+theme: readthedocs
+plugins:
+  - mkdocstrings:
 nav:
   - Home: index.md
   - Getting Started:
@@ -10,7 +13,5 @@ nav:
     - PLOTTING: api/plotting.md
     - PLANE FITTING: api/ransac3d.md
 
-plugins:
-  - mkdocstrings
 
 
