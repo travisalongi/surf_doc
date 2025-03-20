@@ -1,8 +1,9 @@
 site_name: SURF Documentation
 
 theme:
-  name: readthedocs
-  color_mode: auto
+  name: material
+  palatte:
+    scheme: slate
 
 
 nav:
@@ -18,5 +19,6 @@ nav:
 
 plugins:
   - mkdocstrings
+  - search
 
 
