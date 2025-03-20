@@ -1,4 +1,3 @@
-[logo](assets/surf_logo_small.png)
 
 # Welcome to SURF documentation
 
