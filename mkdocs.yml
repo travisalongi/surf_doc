@@ -1,5 +1,7 @@
 site_name: SURF Documentation
 
+repo_url: https://code.usgs.gov/talongi/surf
+
 theme: 
   name: material
   palette:
@@ -27,6 +29,9 @@ theme:
   font:
     text: Arial
     code: Fira Code
+  icon:
+    logo: material/format-strikethrough-variant
+    repo: fontawesome/brands/gitlab
 
 
 
