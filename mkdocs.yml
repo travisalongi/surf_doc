@@ -17,14 +17,14 @@ theme:
       primary: gray
       accent: gray
       toggle:
-        icon: material/brightness-7
+        icon: material/weather-night
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: gray
       accent: gray
       toggle:
-        icon: material/brightness-4
+        icon: material/weather-sunny
         name: Switch to system preference
   font:
     text: Arial
@@ -32,6 +32,13 @@ theme:
   icon:
     logo: material/format-strikethrough-variant
     repo: fontawesome/brands/gitlab
+  language: en
+  features:
+    - header.autohide
+    - search.suggest
+    - search.highlight
+    - navigation.instant
+    - toc.integrate
 
 
 
