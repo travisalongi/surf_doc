@@ -1,3 +1,5 @@
+[logo](assets/surf_logo_small.png)
+
 # Welcome to SURF documentation
 
 **Seismicity Utilized for Reconstructing Faults**
