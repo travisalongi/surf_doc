@@ -1,11 +1,15 @@
+# SURF: Seismicity Utilized for Reconstructing Faults
 
-# Welcome to SURF documentation
+SURF is a python-language code for modeling fault surfaces in 3D using hypocentral locations
 
-**Seismicity Utilized for Reconstructing Faults**
 
-This is the documentation and API for the project. Below are the available sections:
+## 🏄 Overview
+SURF is an algorithm to generate 3D fault models. This algorithm utilizes open-source, well known and documented packages, to generate fault models that require very few user input parameters.
 
-- [Installation](installation.md)
-- [Usage](usage.md)
-- API Reference
+## ⚡ Features
+- **Automated event clustering**: Uses network-based clustering to identify fault-related seismicity.
+- **Surface merging**: Combines small, coplanar clusters to construct continuous fault surfaces.
+- **SVR-based fitting**: Applies support vector regression to estimate fault geometries.
+- **3D visualization**: Generates interactive visualizations of fault models.
+
 
