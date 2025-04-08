@@ -1,4 +1,4 @@
-# Plotting API Documentation
+# UTILS API Documentation
 
 ::: utils
     handler: python
