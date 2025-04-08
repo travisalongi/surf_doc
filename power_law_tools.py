@@ -11,7 +11,7 @@ Author: Travis Alongi (talongi@usgs.gov)
 
 import numpy as np
 from scipy.optimize import minimize
-from utils import midpoint
+from surf.utils import midpoint
 
 import warnings
 
@@ -21,12 +21,16 @@ warnings.filterwarnings("ignore")
 def pj_func(x, v0, d, gamma):
     """
     Modified power-law (Powers & Jordan, 2010)
+    See original manuscript:
+        Powers, P. M., & Jordan, T. H. (2010). Distribution of seismicity
+        across strike‐slip faults in California. 
+        Journal of Geophysical Research: Solid Earth, 115(B5).
 
     This function computes the probability density for a power-law distribution,
     given the parameters v0 (scale), d (cutoff), and gamma (exponent).
 
     Args:
-        x (array-like): Input values for which to compute the power-law probability.
+        x (np.ndarray or list): Input values for which to compute the power-law probability.
         v0 (float): Scale parameter.
         d (float): Cutoff parameter (typically the characteristic length scale).
         gamma (float): Exponent parameter of the power-law distribution.
@@ -42,7 +46,7 @@ def pj_func(x, v0, d, gamma):
         y_values = pj_func(x_values, v0, d, gamma)
         ```
     """
-    v_x = v0 * (d**2 / ((np.abs(x) ** 2) + (d**2))) ** (gamma / 2)
+    v_x = v0 * (d**2 / ((x ** 2) + (d**2))) ** (gamma / 2)
     return v_x
 
 
@@ -54,9 +58,9 @@ def log_likelihood(params, x, n_obs):
     the data follows a Poisson distribution based on a power-law model (Powers & Jordan, 2010).
 
     Args:
-        params (array-like): Parameters [v0, d, gamma] for the power-law model.
-        x (array-like): The data (e.g., fault distances).
-        n_obs (array-like): Observed data (counts for each bin).
+        params (np.ndarray or list): Parameters [v0, d, gamma] for the power-law model.
+        x (np.ndarray or list): Input values for which to compute the power-law probability.
+        n_obs (np.ndarray or list): Observed data (counts for each bin).
 
     Returns:
         float: Negative log-likelihood for the given data and model parameters.
@@ -77,7 +81,7 @@ def log_likelihood(params, x, n_obs):
     return -log_L  # Negative for minimization
 
 
-def maximum_likelihood_estimation(bins, n_obs, initial_params, method="Nelder-Mead"):
+def maximum_likelihood_estimation(bins, n_obs, initial_params, solver_method="Nelder-Mead"):
     """
     Maximum Likelihood Estimation for power-law parameters.
 
@@ -85,9 +89,9 @@ def maximum_likelihood_estimation(bins, n_obs, initial_params, method="Nelder-Me
     minimizing the negative log-likelihood using the given initial parameters.
 
     Args:
-        bins (array-like): The bins or values for which the power-law is fitted.
+        bins (np.ndarray or list): The bins or values for which the power-law is fitted.
         n_obs (array-like/int): The observed counts for each bin.
-        initial_params (array-like/list): Initial guesses for the parameters [phi_0, d, gamma].
+        initial_params (np.ndarray or list): Initial guesses for the parameters [phi_0, d, gamma].
         method (str, optional): The optimization method to use (default is 'Nelder-Mead'). see scipy.optimize
 
     Returns:
@@ -102,7 +106,7 @@ def maximum_likelihood_estimation(bins, n_obs, initial_params, method="Nelder-Me
         print(result.x)  # Estimated [v0, d, gamma]
         ```
     """
-    result = minimize(log_likelihood, initial_params, args=(bins, n_obs), method=method)
+    result = minimize(log_likelihood, initial_params, args=(bins, n_obs), method=solver_method)
     return result
 
 
@@ -114,8 +118,8 @@ def mean_relative_error(obs, fit):
     errors normalized by the observed values, divided by the number of observations.
 
     Args:
-        obs (array-like): Observed data (counts or measurements).
-        fit (array-like): Fitted data (predicted values from a model).
+        obs (np.ndarray or list): Observed data (counts or measurements).
+        fit (np.ndarray or list): Fitted data (predicted values from a model).
 
     Returns:
         float: Mean relative error between the observed and fitted data.
@@ -128,11 +132,11 @@ def mean_relative_error(obs, fit):
         print(f"Mean Relative Error: {error:.4f}")
         ```
     """
-    rel_error = np.sum(np.abs(obs - fit) / obs) / len(obs)
+    rel_error = np.mean(np.abs(obs - fit) / obs)
     return rel_error
 
 
-def compute_histogram(dists, bins):
+def compute_histogram(dist_data, bins):
     """
     Compute histogram of fault distances and normalize.
 
@@ -140,29 +144,29 @@ def compute_histogram(dists, bins):
     the counts by the bin width. It also removes bins with zero counts.
 
     Args:
-        dists (array-like): Fault distances or other data to be histogrammed.
-        bins (array-like): The bin edges for the histogram.
+        dist_data (np.ndarray or list): Fault distances or other data to be histogrammed.
+        bins (np.ndarray or list): The bin edges for the histogram.
 
     Returns:
         tuple: 
-            - xmids (array-like): Midpoints of the bins (excluding zero-count bins).
-            - counts_norm_no_zeros (array-like): Normalized counts, excluding bins with zero counts.
+            - xmids (np.ndarray or list): Midpoints of the bins (excluding zero-count bins).
+            - n_obs_norm_no_zeros (np.ndarray or list): Normalized counts, excluding bins with zero counts.
 
     Example:
         ```python
-        dists = np.random.exponential(scale=5, size=1000)
+        dist_data = np.random.exponential(scale=5, size=1000)
         bins = np.linspace(0, 20, 21)
         xmids, c
         ```
     """
-    H = np.histogram(np.abs(dists), bins=bins, density=False)
-    counts_norm = H[0] / np.diff(H[1])  # Normalize by bin width
-    counts_norm_no_zeros = counts_norm[counts_norm != 0]
-    xmids = midpoint(H[1])[counts_norm != 0]
-    return xmids, counts_norm_no_zeros
+    H = np.histogram(np.abs(dist_data), bins=bins, density=False)
+    n_obs_norm = H[0] / np.diff(H[1])  # Normalize by bin width
+    n_obs_norm_no_zeros = n_obs_norm[n_obs_norm != 0]
+    xmids = midpoint(H[1])[n_obs_norm != 0]
+    return xmids, n_obs_norm_no_zeros
 
 
-def fit_power_law(xmids, counts_norm, init_params):
+def fit_power_law(dist_data, bins, init_params,solver_method="Nelder-Mead"):
     """
     Fit a power-law distribution using Maximum Likelihood Estimation.
 
@@ -170,28 +174,20 @@ def fit_power_law(xmids, counts_norm, init_params):
     calculates the mean relative error between the observed and fitted values.
 
     Args:
-        xmids (array-like): The midpoints of the histogram bins.
-        counts_norm (array-like): The normalized counts for each bin.
-        init_params (array-like): Initial guesses for the power-law parameters [v0, d, gamma].
+        dist_data (np.ndarray or list): Fault distances or other data to be histogrammed.
+        bins (np.ndarray or list): The bin edges for the histogram.
+        init_params (np.ndarray or list): Initial guesses for the power-law parameters [v0, d, gamma].
 
     Returns:
         tuple: 
-            - estimated_params (array-like): The estimated power-law parameters [v0, d, gamma].
-            - mle_fit (array-like): The fitted values based on the estimated parameters.
+            - estimated_params (np.ndarray or list): The estimated power-law parameters [v0, d, gamma].
+            - mle_fit (np.ndarray or list): The fitted values based on the estimated parameters.
             - mre (float): The mean relative error between the observed and fitted values.
 
-    Example:
-        ```python
-        xmids = np.linspace(1, 10, 10)
-        counts_norm = np.array([50, 40, 30, 20, 15, 10, 8, 5, 3])
-        init_params = [1.0, 2.0, 1.5]
-        estimated_params, mle_fit, mre = fit_power_law(xmids, counts_norm, init_params)
-        print(f"Estimated Parameters: {estimated_params}")
-        print(f"Mean Relative Error: {mre:.4f}")
-        ```
     """
-    result = maximum_likelihood_estimation(xmids, counts_norm, init_params)
+    xmids,n_obs_norm_no_zeros = compute_histogram(dist_data,bins)
+    result = maximum_likelihood_estimation(xmids, n_obs_norm_no_zeros, init_params, solver_method=solver_method)
     estimated_params = result.x
     mle_fit = pj_func(xmids, *estimated_params)
-    mre = mean_relative_error(counts_norm, mle_fit)
+    mre = mean_relative_error(n_obs_norm_no_zeros, mle_fit)
     return estimated_params, mle_fit, mre

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 This module contains functions to aid in plotting the data.
 
@@ -9,7 +10,8 @@ import pandas as pd
 import pyvista as pv
 import rasterio
 import matplotlib.colors as mplcolors
-from utils import get_file_name_no_ext, convert_latlon_to_utm
+from pathlib import Path
+from surf.utils import convert_latlon_to_utm
 from rasterio.merge import merge
 from rasterio.warp import reproject, Resampling
 
@@ -62,7 +64,7 @@ def get_xy_coords_raster(geotiff_file):
     return x, y
 
 
-def plot_base_map(plotter, base_map_file):
+def plot_base_map(plotter, base_map_file,opacity=0.2):
     """
     Plots a base map using a GeoTIFF file in PyVista.
 
@@ -89,12 +91,19 @@ def plot_base_map(plotter, base_map_file):
     mesh = np.column_stack([x.flatten(), y.flatten(), np.zeros_like(x).flatten()])
     pdata = pv.PolyData(mesh)
 
-    # Extract transparency values
+    # Extract transparency values and use that for opacity
     gts = gtiff["Tiff Scalars"]
     pdata["orig_sphere"] = gts[:, 0]
-    trans = np.where(gts[:, 3] / gts[:, 3].max() == 0, 1, 0)  # Swap 0s and 1s
-
-    plotter.add_mesh(pdata, cmap="binary_r", opacity=0.2)
+    trans = gts[:,3]
+    print(np.sum(trans==0)/len(trans))
+    if np.all(trans == 0):  # This means there are transparent pixels
+        print("Map has NO transparent pixels")
+        plotter.add_mesh(pdata, cmap="binary_r", opacity=opacity)
+    else:
+        print("Map has some transparent pixels")
+        trans = trans/trans.max()
+        trans = np.where(trans == 0, 1, 0)  # Swap 0s and 1s
+        plotter.add_mesh(pdata, cmap="binary_r", opacity=trans)
 
 
 def plot_fault_surfaces(plotter, ax, files):
@@ -119,17 +128,21 @@ def plot_fault_surfaces(plotter, ax, files):
             ".",
             color=colors[i],
             alpha=0.3,
-            label=get_file_name_no_ext(file),
+            label=Path(file).stem,
         )
         ax.text(
             df.iloc[0].x,
             df.iloc[0].y,
-            get_file_name_no_ext(file),
+            Path(file).stem,
             rotation=30,
             bbox=dict(
                 boxstyle="round", facecolor="whitesmoke", edgecolor=colors[i], alpha=0.8
             ),
         )
+        ax.set_ylabel('UTM northing [m]')
+        ax.set_xlabel('UTM easting [m]')
+        ax.set_title('Fault Surf ID Map')
+        ax.axis('equal')
 
         # Generate and plot 3D surface
         cloud = pv.PolyData(coords)
