@@ -23,7 +23,7 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-def plane_fit_vectorized(pts, thresh=100, maxIteration=1000):
+def plane_fit_vectorized(pts, thresh=100, maxIteration=1000, seed=None):
     """
     Find the best-fitting plane to a 3D point cloud using RANSAC (vectorized version).
     Runs faster than plane_fit version below but requires more ram.
@@ -41,6 +41,9 @@ def plane_fit_vectorized(pts, thresh=100, maxIteration=1000):
 
     if pts.ndim != 2 or pts.shape[1] != 3:
         raise ValueError(f"Expected input of shape (N, 3), got {pts.shape}")
+
+    if seed is not None:
+        np.random.seed(seed)
 
     n_points = pts.shape[0]
 

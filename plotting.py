@@ -134,6 +134,7 @@ def plot_fault_surfaces(plotter, ax, files):
             df.iloc[0].x,
             df.iloc[0].y,
             Path(file).stem,
+            fontsize=14,
             rotation=30,
             bbox=dict(
                 boxstyle="round", facecolor="whitesmoke", edgecolor=colors[i], alpha=0.8

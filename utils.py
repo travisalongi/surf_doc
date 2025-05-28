@@ -8,17 +8,22 @@ Note:
     This module is intended for internal use within the library,
     but may be imported elsewhere as needed.
 
-Author: Travis Alongi (talongi@usgs.gov) 
+Author: Travis Alongi (talongi@usgs.gov)
 """
 
 import os
+import gzip
+import glob
+import shutil
+import requests
+import subprocess
+
 import numpy as np
-import pandas as pd
 from pathlib import Path
-from sklearn.svm import SVR
-from sklearn.model_selection import RandomizedSearchCV
-from scipy.stats import uniform
-from scipy.spatial.transform import Rotation as R
+from typing import Optional
+
+from tqdm import tqdm
+
 from pyproj import CRS, Transformer
 from pyproj.aoi import AreaOfInterest
 from pyproj.database import query_utm_crs_info
@@ -105,3 +110,144 @@ def convert_latlon_to_utm(lat, lon):
     utm_crs = CRS.from_epsg(utm_crs_list[0].code)
     transformer = Transformer.from_proj("epsg:4326", utm_crs, always_xy=True)
     return transformer.transform(lon, lat)
+
+
+def download_file(url: str, dest_path: str) -> str:
+    """
+    Download a file from a URL if it doesn't already exist.
+
+    Args:
+        url: The URL to download from.
+        dest_path: Full path to save the file (including filename).
+
+    Returns:
+        Path to the downloaded file, or None if failed.
+    """
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+
+    if os.path.exists(dest_path):
+        print(f"{os.path.basename(dest_path)} already exists. Skipping download.")
+        return dest_path
+
+    print(f"Downloading {os.path.basename(dest_path)}...")
+
+    try:
+        response = requests.get(url, stream=True, timeout=10,verify=False)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Error downloading {os.path.basename(dest_path)}: {e}")
+        return None
+
+    total_size = int(response.headers.get("content-length", 0))
+    block_size = 1024
+
+    with (
+        open(dest_path, "wb") as file,
+        tqdm(
+            total=total_size,
+            unit="B",
+            unit_scale=True,
+            desc=os.path.basename(dest_path),
+        ) as bar,
+    ):
+        for data in response.iter_content(block_size):
+            file.write(data)
+            bar.update(len(data))
+
+    print(f"Downloaded to {dest_path}")
+    return dest_path
+
+
+def decompress_gz_file(
+    gz_path: str, dest_path: str | None = None, overwrite: bool = False
+) -> str:
+    """Decompress a .gz file to the destination path."""
+    if dest_path is None:
+        dest_path = gz_path[:-3]  # Remove .gz
+
+    if os.path.exists(dest_path) and not overwrite:
+        print(f"{dest_path} already exists. Skipping decompression.")
+        return dest_path
+
+    print(f"Decompressing {gz_path}...")
+
+    with gzip.open(gz_path, "rb") as f_in, open(dest_path, "wb") as f_out:
+        shutil.copyfileobj(f_in, f_out)
+
+    print(f"Decompressed to {dest_path}")
+    return dest_path
+
+
+def convert_dd_catalog_to_csv(
+    input_txt: str, output_csv: str, skip_lines: int = 97, header_names_list=None
+):
+    """
+    Convert a Northern California DD catalog .txt file to a CSV.
+
+    Parameters:
+    ----------
+    input_txt : str
+        Path to the downloaded DD catalog file.
+    output_csv : str
+        Path to output CSV file.
+    """
+    if header_names_list is None:
+        header_names = [
+            "year",
+            "month",
+            "day",
+            "hour",
+            "minute",
+            "second",
+            "lat",
+            "lon",
+            "depth_km",
+            "eh1_km",
+            "eh2_km",
+            "azimuth_deg",
+            "ez_km",
+            "mag",
+            "event_id",
+        ]
+        header_line = ",".join(header_names)
+
+    else:
+        header_names = header_names_list
+        header_line = ",".join(header_names)
+
+    # Awk is just easier for this than python
+    awk_command = (
+        f"awk 'NR > {skip_lines} {{ "
+        f"for (i = 1; i <= NF; i++) {{ "
+        f'printf "%s%s", $i, (i==NF ? "\\n" : ",") '
+        f"}} "
+        f"}}' {input_txt}"
+    )
+
+    # Get the total number of lines in the input file to use with tqdm
+    total_lines = subprocess.check_output(f"wc -l < {input_txt}", shell=True)
+    total_lines = int(total_lines.strip())
+
+    # Open output file, write the header, then run awk with tqdm progress bar
+    with open(output_csv, "w") as out:
+        out.write(header_line + "\n")  # Write header row
+        # Run awk with a subprocess, updating tqdm with each line processed
+        with subprocess.Popen(awk_command, shell=True, stdout=subprocess.PIPE) as proc:
+            # Use tqdm to track progress based on the total number of lines
+            with tqdm(total=total_lines - 97, desc="Processing file") as pbar:
+                for line in proc.stdout:
+                    out.write(line.decode("utf-8"))  # Write output to CSV
+                    pbar.update(1)
+
+    print(f"CSV with headers written to {output_csv}")
+
+
+def remove_temp_files(directory: str = "./input", pattern: str = "*temp*"):
+    """Removes temporary files"""
+    files_to_remove = glob.glob(os.path.join(directory, pattern))
+    for file in files_to_remove:
+        try:
+            os.remove(file)
+            print(f"Removed: {file}")
+        except Exception as e:
+            print(f"Failed to remove {file}: {e}")
