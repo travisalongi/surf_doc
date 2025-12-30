@@ -75,7 +75,7 @@ def midpoint(array):
     return y
 
 
-def convert_latlon_to_utm(lat, lon):
+def convert_latlon_to_utm(lat, lon,return_crs=False):
     """
     Converts latitude and longitude arrays to UTM coordinates.
 
@@ -108,8 +108,12 @@ def convert_latlon_to_utm(lat, lon):
         ),
     )
     utm_crs = CRS.from_epsg(utm_crs_list[0].code)
+    # print(f'Converted Lat/Lon to {utm_crs}')
     transformer = Transformer.from_proj("epsg:4326", utm_crs, always_xy=True)
-    return transformer.transform(lon, lat)
+    if return_crs is True:
+        return transformer.transform(lon, lat), utm_crs
+    else:
+        return transformer.transform(lon, lat)
 
 
 def download_file(url: str, dest_path: str) -> str:

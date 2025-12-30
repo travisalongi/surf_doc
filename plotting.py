@@ -106,7 +106,7 @@ def plot_base_map(plotter, base_map_file,opacity=0.2):
         plotter.add_mesh(pdata, cmap="binary_r", opacity=trans)
 
 
-def plot_fault_surfaces(plotter, ax, files):
+def plot_fault_surfaces(plotter, ax, files,colors=None):
     """
     Plots 3D fault surfaces and their 2D projections.
 
@@ -115,7 +115,9 @@ def plot_fault_surfaces(plotter, ax, files):
         ax (matplotlib.axes.Axes): Matplotlib axis for 2D projection.
         files (list): List of file paths to fault surface data (CSV format).
     """
-    colors = cb_friendly_sequential_cool_colormap(len(files))
+
+    if colors is None:
+        colors = cb_friendly_sequential_cool_colormap(len(files))
 
     for i, file in enumerate(files):
         df = pd.read_csv(file)
@@ -193,6 +195,7 @@ def plot_topo(
     monochromatic=False,
     min_elev=-10000,
     max_elev=15000,
+    clims=[-10000,10000]
 ):
     """
     Plots topography from multiple GeoTIFF tiles in a PyVista plotter.
@@ -270,10 +273,12 @@ def plot_topo(
         plotter.add_mesh(
             grid,
             scalars=grid["Elevation"],
-            cmap="terrain",
+            # cmap="terrain",
+            cmap="gist_earth",
             show_edges=False,
             opacity=opacity,
-            clim=[-np.nanmax(elevation), np.nanmax(elevation)],
+            # clim=[-np.nanmax(elevation), np.nanmax(elevation)],
+            clim=clims,
         )
 
     return utm_x, utm_y, elevation, grid
